@@ -1,0 +1,72 @@
+Line no 1: TOKEN <INT> Lexeme int found
+Line no 1: TOKEN <ID> Lexeme main found
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Line no 1: TOKEN <LPAREN> Lexeme ( found
+Line no 1: TOKEN <RPAREN> Lexeme ) found
+Line no 1: TOKEN <LCURL> Lexeme { found
+Line no 2: TOKEN <INT> Lexeme int found
+Line no 2: TOKEN <ID> Lexeme a found
+ScopeTable # 1.1
+6 --> < a : ID >
+
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Line no 2: TOKEN <SEMICOLON> Lexeme ; found
+Line no 3: TOKEN <IF> Lexeme if found
+Line no 3: TOKEN <LPAREN> Lexeme ( found
+Line no 3: TOKEN <ID> Lexeme a found
+a already exists in ScopeTable# 1.1
+Line no 3: TOKEN <RELOP> Lexeme == found
+Line no 3: TOKEN <CONST_INT> Lexeme 2 found
+ScopeTable # 1.1
+1 --> < 2 : CONST_INT >
+6 --> < a : ID >
+
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Line no 3: TOKEN <RPAREN> Lexeme ) found
+Line no 3: TOKEN <LCURL> Lexeme { found
+Line no 4: TOKEN <INT> Lexeme int found
+Line no 4: TOKEN <ID> Lexeme b found
+ScopeTable # 1.1.1
+0 --> < b : ID >
+
+ScopeTable # 1.1
+1 --> < 2 : CONST_INT >
+6 --> < a : ID >
+
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Line no 4: TOKEN <SEMICOLON> Lexeme ; found
+Line no 5: TOKEN <CHAR> Lexeme char found
+Line no 5: TOKEN <ID> Lexeme b found
+b already exists in ScopeTable# 1.1.1
+Line no 5: TOKEN <SEMICOLON> Lexeme ; found
+Line no 6: TOKEN <RCURL> Lexeme } found
+Line no 7: TOKEN <RETURN> Lexeme return found
+Line no 7: TOKEN <CONST_INT> Lexeme 0 found
+ScopeTable # 1.1
+1 --> < 2 : CONST_INT >
+6 --> < a : ID > < 0 : CONST_INT >
+
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Line no 7: TOKEN <SEMICOLON> Lexeme ; found
+Line no 8: TOKEN <RCURL> Lexeme } found
+ScopeTable # 1
+1 --> < main : ID >
+
+
+Total lines: 9
+Total errors: 0

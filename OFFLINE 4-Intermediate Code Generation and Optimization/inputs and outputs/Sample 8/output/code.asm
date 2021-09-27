@@ -1,0 +1,442 @@
+.MODEL SMALL
+
+.STACK 100H
+
+.DATA
+
+	CR EQU 0DH
+	LF EQU 0AH
+
+.CODE
+
+
+PRINTLN PROC
+
+;PRINTS THE NUMBER STORED IN AX
+	PUSH AX
+	PUSH BX
+	PUSH CX
+	PUSH DX
+	CMP AX,0
+	JGE HERE
+;NEGATIVE NUMBER
+	PUSH AX
+	MOV AH, 2
+	MOV DL, '-'
+	INT 21H
+	POP AX
+	NEG AX
+HERE:
+	XOR CX,CX
+	MOV BX , 10
+LOOP_:
+	CMP AX,0
+	JE END_LOOP
+	XOR DX,DX
+	DIV BX
+	PUSH DX
+	INC CX
+	JMP LOOP_
+END_LOOP:
+	CMP CX,0
+	JNE PRINTER
+	MOV AH,2
+	MOV DL,'0'
+	INT 21H
+	JMP ENDER
+PRINTER:
+	MOV AH,2
+	POP DX
+	OR DL,30H
+	INT 21H
+	LOOP PRINTER
+ENDER:
+;PRINT NEW LINE
+	MOV AH, 2
+	MOV DL , LF
+	INT 21H
+	MOV DL , CR
+	INT 21H
+	POP DX
+	POP CX
+	POP BX
+	POP AX
+	RET
+PRINTLN ENDP
+
+f PROC
+
+	POP DI
+	PUSH 0
+	PUSH 5
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+;code while (k>0)
+LABEL2:
+	PUSH 0
+; doing relop operation k>0
+	MOV BP,SP
+	MOV AX, [BP+2]
+	CMP AX , [BP+0]
+	JG LABEL0
+	MOV BX,0
+	JMP LABEL1
+
+
+LABEL0:
+	MOV BX,1
+
+
+LABEL1:
+	POP DX
+	PUSH BX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	CMP AX , 0
+	JE LABEL3
+;Incrementing varibale a, 1
+	MOV BP,SP
+	MOV AX,[BP+4]
+	PUSH AX
+	ADD AX,1
+	MOV [BP+4] , AX
+	POP DX
+;Incrementing varibale k, -1
+	MOV BP,SP
+	MOV AX,[BP+2]
+	PUSH AX
+	ADD AX,-1
+	MOV [BP+2] , AX
+	POP DX
+	POP DX
+	JMP LABEL2
+LABEL3:
+	POP DX
+;Return 3*a-7
+	PUSH 3
+; doing mulop operation 3*a
+	MOV BP,SP
+	MOV AX , [BP+0]
+	IMUL [BP+4]
+	POP DX
+	PUSH AX
+	PUSH 7
+	MOV BP,SP
+	MOV AX, [BP+2]
+	SUB AX, [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX,[BP+0]
+	POP DX
+	POP DX
+	POP DX
+	PUSH DI
+	RET
+	PUSH 9
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+2] , AX
+	PUSH DI
+	RET
+f ENDP
+
+g PROC
+
+	POP DI
+	PUSH 0
+	PUSH 0
+;calling function f
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+8]
+	CALL f
+	POP DI
+	PUSH AX
+	MOV BP,SP
+	MOV AX, [BP+0]
+	ADD AX, [BP+8]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX, [BP+0]
+	ADD AX, [BP+6]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+2] , AX
+;code for (i=0; i<7; i++)
+	PUSH 0
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+LABEL10:
+	PUSH 7
+; doing relop operation i<7
+	MOV BP,SP
+	MOV AX, [BP+2]
+	CMP AX , [BP+0]
+	JL LABEL4
+	MOV BX,0
+	JMP LABEL5
+
+
+LABEL4:
+	MOV BX,1
+
+
+LABEL5:
+	POP DX
+	PUSH BX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	CMP AX , 0
+	JE LABEL11
+	PUSH 0
+	PUSH 3
+; doing mulop operation i%3
+	MOV BP,SP
+	MOV AX, [BP+6]
+	CWD
+	MOV BX,[BP+0]
+	IDIV BX
+	IMUL BX
+	MOV BX,[BP+6]
+	SUB BX , AX
+	POP DX
+	PUSH BX
+	PUSH 0
+; doing relop operation i%3==0
+	MOV BP,SP
+	MOV AX, [BP+2]
+	CMP AX , [BP+0]
+	JE LABEL6
+	MOV BX,0
+	JMP LABEL7
+
+
+LABEL6:
+	MOV BX,1
+
+
+LABEL7:
+	POP DX
+	POP DX
+	PUSH BX
+;code if else (i%3==0)
+	MOV BP,SP
+	CMP [BP+ 0] , 0
+	JE LABEL8
+	PUSH 5
+	MOV BP,SP
+	MOV AX, [BP+10]
+	ADD AX, [BP+0]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+8] , AX
+	JMP LABEL9
+LABEL8:
+	PUSH 1
+	MOV BP,SP
+	MOV AX, [BP+10]
+	SUB AX, [BP+0]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+8] , AX
+LABEL9:
+	POP DX
+	POP DX
+;Incrementing varibale i, 1
+	MOV BP,SP
+	MOV AX,[BP+2]
+	PUSH AX
+	ADD AX,1
+	MOV [BP+2] , AX
+	POP DX
+	POP DX
+	JMP LABEL10
+LABEL11:
+	POP DX
+;Return x
+	MOV BP,SP
+	MOV AX,[BP+2]
+	POP DX
+	POP DX
+	POP DX
+	POP DX
+	PUSH DI
+	RET
+	PUSH DI
+	RET
+g ENDP
+
+MAIN PROC
+
+	MOV AX, @DATA
+	MOV DS, AX
+	PUSH 0
+	PUSH 0
+	PUSH 0
+	PUSH 1
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+4] , AX
+	PUSH 2
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+2] , AX
+;calling function g
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+6]
+	MOV BP,SP
+	PUSH [BP+6]
+	CALL g
+	POP DI
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+4] , AX
+;printing a
+	MOV BP,SP
+	MOV AX, [BP+ 4]
+	CALL PRINTLN
+;code for (i=0; i<4; i++)
+	PUSH 0
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+LABEL18:
+	PUSH 4
+; doing relop operation i<4
+	MOV BP,SP
+	MOV AX, [BP+2]
+	CMP AX , [BP+0]
+	JL LABEL12
+	MOV BX,0
+	JMP LABEL13
+
+
+LABEL12:
+	MOV BX,1
+
+
+LABEL13:
+	POP DX
+	PUSH BX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	CMP AX , 0
+	JE LABEL19
+	PUSH 0
+	PUSH 3
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+8] , AX
+;code while (a>0)
+LABEL16:
+	PUSH 0
+; doing relop operation a>0
+	MOV BP,SP
+	MOV AX, [BP+10]
+	CMP AX , [BP+0]
+	JG LABEL14
+	MOV BX,0
+	JMP LABEL15
+
+
+LABEL14:
+	MOV BX,1
+
+
+LABEL15:
+	POP DX
+	PUSH BX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	CMP AX , 0
+	JE LABEL17
+;Incrementing varibale b, 1
+	MOV BP,SP
+	MOV AX,[BP+8]
+	PUSH AX
+	ADD AX,1
+	MOV [BP+8] , AX
+	POP DX
+;Incrementing varibale a, -1
+	MOV BP,SP
+	MOV AX,[BP+10]
+	PUSH AX
+	ADD AX,-1
+	MOV [BP+10] , AX
+	POP DX
+	POP DX
+	JMP LABEL16
+LABEL17:
+	POP DX
+	POP DX
+;Incrementing varibale i, 1
+	MOV BP,SP
+	MOV AX,[BP+2]
+	PUSH AX
+	ADD AX,1
+	MOV [BP+2] , AX
+	POP DX
+	POP DX
+	JMP LABEL18
+LABEL19:
+	POP DX
+;printing a
+	MOV BP,SP
+	MOV AX, [BP+ 4]
+	CALL PRINTLN
+;printing b
+	MOV BP,SP
+	MOV AX, [BP+ 2]
+	CALL PRINTLN
+;printing i
+	MOV BP,SP
+	MOV AX, [BP+ 0]
+	CALL PRINTLN
+;Return 0
+	PUSH 0
+	POP DX
+;DOS EXIT
+	MOV AH, 4CH
+	INT 21H
+
+;DOS EXIT
+	MOV AH, 4CH
+	INT 21H
+MAIN ENDP
+END MAIN
+

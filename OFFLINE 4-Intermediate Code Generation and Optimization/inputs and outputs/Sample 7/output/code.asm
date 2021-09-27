@@ -1,0 +1,252 @@
+.MODEL SMALL
+
+.STACK 100H
+
+.DATA
+
+	CR EQU 0DH
+	LF EQU 0AH
+
+.CODE
+
+
+PRINTLN PROC
+
+;PRINTS THE NUMBER STORED IN AX
+	PUSH AX
+	PUSH BX
+	PUSH CX
+	PUSH DX
+	CMP AX,0
+	JGE HERE
+;NEGATIVE NUMBER
+	PUSH AX
+	MOV AH, 2
+	MOV DL, '-'
+	INT 21H
+	POP AX
+	NEG AX
+HERE:
+	XOR CX,CX
+	MOV BX , 10
+LOOP_:
+	CMP AX,0
+	JE END_LOOP
+	XOR DX,DX
+	DIV BX
+	PUSH DX
+	INC CX
+	JMP LOOP_
+END_LOOP:
+	CMP CX,0
+	JNE PRINTER
+	MOV AH,2
+	MOV DL,'0'
+	INT 21H
+	JMP ENDER
+PRINTER:
+	MOV AH,2
+	POP DX
+	OR DL,30H
+	INT 21H
+	LOOP PRINTER
+ENDER:
+;PRINT NEW LINE
+	MOV AH, 2
+	MOV DL , LF
+	INT 21H
+	MOV DL , CR
+	INT 21H
+	POP DX
+	POP CX
+	POP BX
+	POP AX
+	RET
+PRINTLN ENDP
+
+bar PROC
+
+	POP DI
+	PUSH 0
+	PUSH 4
+; doing mulop operation 4*a
+	MOV BP,SP
+	MOV AX , [BP+0]
+	IMUL [BP+6]
+	POP DX
+	PUSH AX
+	PUSH 2
+; doing mulop operation 2*b
+	MOV BP,SP
+	MOV AX , [BP+0]
+	IMUL [BP+6]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX, [BP+2]
+	ADD AX, [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+;Return c
+	MOV BP,SP
+	MOV AX,[BP+0]
+	POP DX
+	POP DX
+	POP DX
+	PUSH DI
+	RET
+	PUSH DI
+	RET
+bar ENDP
+
+foo PROC
+
+	POP DI
+	PUSH 3
+	MOV BP,SP
+	MOV AX, [BP+2]
+	ADD AX, [BP+0]
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+;Return a
+	MOV BP,SP
+	MOV AX,[BP+0]
+	POP DX
+	PUSH DI
+	RET
+	PUSH DI
+	RET
+foo ENDP
+
+MAIN PROC
+
+	MOV AX, @DATA
+	MOV DS, AX
+	PUSH 0
+	PUSH 0
+	PUSH 0
+	PUSH 0
+	PUSH 5
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+6] , AX
+	PUSH 6
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+4] , AX
+;calling function foo
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+8]
+	CALL foo
+	POP DI
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+2] , AX
+;printing k
+	MOV BP,SP
+	MOV AX, [BP+ 2]
+	CALL PRINTLN
+;calling function bar
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+8]
+	MOV BP,SP
+	PUSH [BP+8]
+	CALL bar
+	POP DI
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+0] , AX
+;printing l
+	MOV BP,SP
+	MOV AX, [BP+ 0]
+	CALL PRINTLN
+	PUSH 6
+;calling function bar
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+10]
+	MOV BP,SP
+	PUSH [BP+10]
+	CALL bar
+	POP DI
+	PUSH AX
+; doing mulop operation 6*bar(i,j)
+	MOV BP,SP
+	MOV AX , [BP+2]
+	IMUL [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	PUSH 2
+	MOV BP,SP
+	MOV AX, [BP+2]
+	ADD AX, [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	PUSH 3
+;calling function foo
+	PUSH DI
+	MOV BP,SP
+	PUSH [BP+12]
+	CALL foo
+	POP DI
+	PUSH AX
+; doing mulop operation 3*foo(i)
+	MOV BP,SP
+	MOV AX , [BP+2]
+	IMUL [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX, [BP+2]
+	SUB AX, [BP+0]
+	POP DX
+	POP DX
+	PUSH AX
+	MOV BP,SP
+	MOV AX , [BP+0]
+	POP DX
+	MOV BP,SP
+	MOV [BP+4] , AX
+;printing j
+	MOV BP,SP
+	MOV AX, [BP+ 4]
+	CALL PRINTLN
+;Return 0
+	PUSH 0
+	POP DX
+;DOS EXIT
+	MOV AH, 4CH
+	INT 21H
+
+;DOS EXIT
+	MOV AH, 4CH
+	INT 21H
+MAIN ENDP
+END MAIN
+
